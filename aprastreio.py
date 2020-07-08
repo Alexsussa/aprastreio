@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-__version__ = 0.8
+__version__ = 0.9
 
 from tkinter.ttk import *
 from tkinter.messagebox import *
@@ -43,7 +43,7 @@ def CheckUpdates(event=None):
         subprocess.call(
             ['notify-send', 'AP - Rastreio Correios', 'Há uma nova versão disponível. Baixe agora!'])
         info = showinfo(title='Atualização', message='Há uma nova versão disponível. Baixe agora!')
-        webbrowser.open('https://www.dropbox.com/s/j125smtw2lbxfyp/aprastreio.deb?dl=true')
+        webbrowser.open('https://github.com/Alexsussa/aprastreio/releases/')
 
 
 class Rastreio(object):
@@ -132,14 +132,16 @@ class Rastreio(object):
         janela.bind('<Control-l>', self.Limpar)
         janela.bind('<Control-L>', self.Limpar)
         janela.bind('<Enter>', Thread(target=CheckUpdates).start())
-        janela.bind('<Return>', self.Rastrear)
-        janela.bind('<KP_Enter>', self.Rastrear)
+        janela.bind('<Return>', self.Rastrear, self.BuscaRastreio)
+        janela.bind('<KP_Enter>', self.Rastrear, self.BuscaRastreio)
 
         # OJ027511100BR
 
         # LB013346195HK
 
         # self.txtRastreio.insert(INSERT, 'OJ027511100BR')
+
+        #janela.bind('<Control-a>', self.NotifAltStatus)
 
     """def NotifAltStatus(self, event=None):
         statusList = []
@@ -151,8 +153,8 @@ class Rastreio(object):
             soup = BeautifulSoup(linkcorreios, 'html.parser')
             lastStatus = soup.find('ul', attrs={'class': 'linha_status'})
             last = lastStatus.text.strip().upper()
-            if lastStatus.get_text('linha_status') != last:
-                subprocess.call(['notify-send', 'AP - Rastreio Correios', f'{cod[2]}\n\n{last}'])"""
+            if last != last:
+                subprocess.call(['notify-send', 'AP - Rastreio Correios', f'ALTERAÇÂO DE STATUS\n\n{cod[2]}\n\n{last}'])"""
 
     def MenuMouse(self, event):
         w = event.widget
@@ -177,7 +179,6 @@ class Rastreio(object):
                 linkcorreios = urlopen(f'https://www.linkcorreios.com.br/?id={rastreio}', timeout=20)
                 soup = BeautifulSoup(linkcorreios, 'html.parser')
                 status = soup.find('div', attrs={'class': 'singlepost'})
-                blank = soup.find('p')
                 retorno = ''
                 if status:
                     retorno = status.text.strip().upper()
@@ -191,13 +192,12 @@ class Rastreio(object):
                 self.campo.insert(INSERT, retorno)
                 self.campo.config(state='disable')
                 lastStatus = soup.find('ul', attrs={'class': 'linha_status'})
-                blank = soup.find('p')
                 if lastStatus:
                     last = lastStatus.text.strip().upper()
                 else:
                     last = 'O rastreamento não está disponível no momento:\n\n' \
-                              '- Verifique se o código do objeto está correto;\n' \
-                              '- O objeto pode demorar até 24 horas (após postagem) para ser rastreado no sistema dos Correios.'.strip().upper()
+                           '- Verifique se o código do objeto está correto;\n' \
+                           '- O objeto pode demorar até 24 horas (após postagem) para ser rastreado no sistema dos Correios.'.strip().upper()
                 subprocess.call(['notify-send', 'AP - Rastreio Correios', f'{objeto}\n\n{last}'])
 
             except socket.error:
@@ -227,7 +227,10 @@ class Rastreio(object):
                 f'https://web.whatsapp.com/send?phone=&text=Ol%c3%a1.%20Clique%20no%20link%20para%20rastrear%20o%20objeto%20c%c3%b3digo%20{rastreio}%0ahttps%3a%2f%2fwww.linkcorreios.com.br%2f{rastreio}%3fw%3d1&source=&data=')
 
     def Email(self):
-        rastreio = self.txtRastreio.get().strip().upper()
+        if not os.path.exists('/usr/bin/thunderbird') and not os.path.exists('/usr/bin/evolution'):
+            aviso = showwarning(title='AVISO', message='Nenhum cliente de email está instalado em seu computador.')
+        else:
+            rastreio = self.txtRastreio.get().strip().upper()
 
         if rastreio == '':
             erro = showerror(title='AVISO', message='Para fazer o envio pelo Email, primeiro busque pelo rastreio.')
@@ -323,11 +326,11 @@ class Rastreio(object):
                 return None
 
     def ListaObjetos(self, event=None):
-        c.execute(f'SELECT objeto FROM rastreio ORDER BY objeto')
+        c.execute(f'SELECT objeto FROM rastreio ORDER BY id')
         for objeto in c:
             if objeto[0] not in listaObjeto:
                 listaObjeto.append(objeto[0])
-        return tuple(listaObjeto)
+        return tuple(reversed(listaObjeto))
 
     def ListaRastreio(self, event=None):
         c.execute(f'SELECT codrastreio FROM rastreio ORDER BY codrastreio')
@@ -384,6 +387,6 @@ janela.tk.call('wm', 'iconphoto', janela._w, iconejanela)
 janela.resizable(False, False)
 janela.geometry('630x610')
 Rastreio(janela)
-janela.title('AP - RASTREIO CORREIOS v0.8')
+janela.title('AP - RASTREIO CORREIOS v0.9')
 janela.update()
 janela.mainloop()
