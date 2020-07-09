@@ -35,8 +35,6 @@ else:
 
 
 def CheckUpdates(event=None):
-    # subprocess.call(['notify-send', 'Megatecshop - Rastreio Correios', '\nProcurando por novas atualizações...'])
-    # aviso = showinfo(title='Aguarde...', message='Procurando por novas atualizações...')
     janela.unbind('<Enter>')
     versao = urlopen('https://www.dropbox.com/s/61rpf1xg8qr1vh1/version_linux.txt?dl=true').read()
     if float(versao) > float(__version__):
@@ -74,7 +72,6 @@ class Rastreio(object):
         self.txtRastreio = Entry(self.c1, width=15, bg='white', fg='black', selectbackground='blue',
                                  selectforeground='white')
         self.txtRastreio.pack(side=LEFT, padx=2)
-        janela.bind('<Return>', self.BuscaRastreio)
 
         self.lbObjeto = Label(self.c1, text='OBJETO:', fg='black')
         self.lbObjeto.pack(side=LEFT)
@@ -84,8 +81,12 @@ class Rastreio(object):
         janela.bind('<<ComboboxSelected>>', self.Busca)
 
         self.btnRastrear = Button(self.c1, text='RASTREAR', fg='black',
-                                  command=lambda: Thread(target=self.Rastrear).start())
+                                  command=lambda: {Thread(target=self.Rastrear).start(), self.BuscaRastreio()})
         self.btnRastrear.pack(side=LEFT, padx=2)
+        janela.bind('<Return>', self.BuscaRastreio)
+        janela.bind('<Return>', self.Rastrear, self.BuscaRastreio)
+        janela.bind('<KP_Enter>', self.BuscaRastreio)
+        janela.bind('<KP_Enter>', self.Rastrear, self.BuscaRastreio)
 
         self.campo = Text(self.c2, width=77, height=30, bg='lightgray', fg='black', state='disable',
                           selectbackground='blue', font=('sans-serif', '10'))
@@ -132,8 +133,6 @@ class Rastreio(object):
         janela.bind('<Control-l>', self.Limpar)
         janela.bind('<Control-L>', self.Limpar)
         janela.bind('<Enter>', Thread(target=CheckUpdates).start())
-        janela.bind('<Return>', self.Rastrear, self.BuscaRastreio)
-        janela.bind('<KP_Enter>', self.Rastrear, self.BuscaRastreio)
 
         # OJ027511100BR
 
@@ -141,7 +140,7 @@ class Rastreio(object):
 
         # self.txtRastreio.insert(INSERT, 'OJ027511100BR')
 
-        #janela.bind('<Control-a>', self.NotifAltStatus)
+        # janela.bind('<Control-a>', self.NotifAltStatus)
 
     """def NotifAltStatus(self, event=None):
         statusList = []
