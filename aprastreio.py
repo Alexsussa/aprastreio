@@ -134,12 +134,6 @@ class Rastreio(object):
         janela.bind('<Control-L>', self.Limpar)
         janela.bind('<Enter>', Thread(target=CheckUpdates).start())
 
-        # OJ027511100BR
-
-        # LB013346195HK
-
-        # self.txtRastreio.insert(INSERT, 'OJ027511100BR')
-
         # janela.bind('<Control-a>', self.NotifAltStatus)
 
     """def NotifAltStatus(self, event=None):
