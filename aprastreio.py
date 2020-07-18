@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-__version__ = 0.9
+__version__ = 1.0
 
 from tkinter.ttk import *
 from tkinter.messagebox import *
@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from mailcomposer import MailComposer
 from threading import Thread
+from multiprocessing import Pool
 import os
 import sys
 import sqlite3
@@ -134,20 +135,31 @@ class Rastreio(object):
         janela.bind('<Control-L>', self.Limpar)
         janela.bind('<Enter>', Thread(target=CheckUpdates).start())
 
-        # janela.bind('<Control-a>', self.NotifAltStatus)
+        janela.bind('<Control-a>', self.NotifAltStatus)
+        janela.bind('<Control-A>', self.NotifAltStatus)
+        janela.after(1800000, self.NotifAltStatus)
 
-    """def NotifAltStatus(self, event=None):
-        statusList = []
+    def NotifAltStatus(self, event=None):
+        info = showinfo(title='ATUALIZANDO RASTREIOS',
+                        message='Atualizando status dos rastreios. Por favor, aguarde...',
+                        detail='Clique em OK e aguarde até esta janela se fechar.')
         rastreio = self.txtRastreio.get()
         objeto = self.txtObjeto.get()
         c.execute('SELECT * FROM rastreio ORDER BY codrastreio')
+        self.Limpar()
         for cod in c:
             linkcorreios = urlopen(f'https://www.linkcorreios.com.br/?id={cod[1]}')
             soup = BeautifulSoup(linkcorreios, 'html.parser')
             lastStatus = soup.find('ul', attrs={'class': 'linha_status'})
             last = lastStatus.text.strip().upper()
-            if last != last:
-                subprocess.call(['notify-send', 'AP - Rastreio Correios', f'ALTERAÇÂO DE STATUS\n\n{cod[2]}\n\n{last}'])"""
+            if last[0:39] != 'STATUS: OBJETO ENTREGUE AO DESTINATÁRIO':
+                self.campo.config(state='normal')
+                self.campo.insert(INSERT, '-' * 80)
+                self.campo.insert(INSERT, '\n\nALTERAÇÃO DE STATUS')
+                self.campo.insert(INSERT, f'\n\n{cod[2]}\n{cod[1]}\n\n{last}\n\n', '-' * 80)
+                self.campo.config(state='disable')
+                subprocess.call(
+                    ['notify-send', 'AP - Rastreio Correios', f'ALTERAÇÂO DE STATUS\n\n{cod[2]}\n\n{last}\n\n'])
 
     def MenuMouse(self, event):
         w = event.widget
@@ -380,6 +392,6 @@ janela.tk.call('wm', 'iconphoto', janela._w, iconejanela)
 janela.resizable(False, False)
 janela.geometry('630x610')
 Rastreio(janela)
-janela.title('AP - RASTREIO CORREIOS v0.9')
+janela.title('AP - RASTREIO CORREIOS v1.0')
 janela.update()
 janela.mainloop()
