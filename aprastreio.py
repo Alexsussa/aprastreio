@@ -84,10 +84,9 @@ class Rastreio(object):
         self.btnRastrear = Button(self.c1, text='RASTREAR', fg='black',
                                   command=lambda: {Thread(target=self.Rastrear).start(), self.BuscaRastreio()})
         self.btnRastrear.pack(side=LEFT, padx=2)
-        janela.bind('<Return>', self.BuscaRastreio)
-        janela.bind('<Return>', self.Rastrear, self.BuscaRastreio)
-        janela.bind('<KP_Enter>', self.BuscaRastreio)
-        janela.bind('<KP_Enter>', self.Rastrear, self.BuscaRastreio)
+        ttips.Create(self.btnRastrear, text='Rastrear, ENTER')
+        janela.bind('<Return>', lambda e: {Thread(target=self.Rastrear).start(), self.BuscaRastreio()})
+        janela.bind('<KP_Enter>', lambda e: {Thread(target=self.Rastrear).start(), self.BuscaRastreio()})
 
         self.campo = Text(self.c2, width=77, height=30, bg='lightgray', fg='black', state='disable',
                           selectbackground='blue', font=('sans-serif', '10'))
@@ -101,23 +100,33 @@ class Rastreio(object):
 
         self.btnWhatsapp = Button(image=self.whatsappimg, command=lambda: Thread(target=self.WhatsApp).start())
         self.btnWhatsapp.pack(side=RIGHT)
-        ttips.Create(self.btnWhatsapp, text='Enviar por WhatsApp')
+        ttips.Create(self.btnWhatsapp, text='Enviar por WhatsApp, Ctrl+W')
+        janela.bind('<Control-w>', lambda e: Thread(target=self.WhatsApp).start())
+        janela.bind('<Control-W>', lambda e: Thread(target=self.WhatsApp).start())
 
         self.btnEmail = Button(image=self.emailimg, command=lambda: Thread(target=self.Email).start())
         self.btnEmail.pack(side=RIGHT)
-        ttips.Create(self.btnEmail, text='Enviar por Email')
+        ttips.Create(self.btnEmail, text='Enviar por Email, CTRL+E')
+        janela.bind('<Control-e>', lambda e: Thread(target=self.Email).start())
+        janela.bind('<Control-E>', lambda e: Thread(target=self.Email).start())
 
         self.btnSalvar = Button(image=self.salvarimg, command=lambda: [self.RastreioExiste(), self.Cadastrar()])
         self.btnSalvar.pack(side=LEFT, padx=1)
-        ttips.Create(self.btnSalvar, text='Salvar')
+        ttips.Create(self.btnSalvar, text='Salvar, CTRL+S')
+        janela.bind('<Control-s>', lambda e: Thread(target=self.Cadastrar).start())
+        janela.bind('<Control-S>', lambda e: Thread(target=self.Cadastrar).start())
 
         self.btnAtualizar = Button(image=self.atualizarimg, command=self.Atualizar)
         self.btnAtualizar.pack(side=LEFT, padx=1)
-        ttips.Create(self.btnAtualizar, text='Atualizar')
+        ttips.Create(self.btnAtualizar, text='Atualizar, CTRL+U')
+        janela.bind('<Control-u>', lambda e: Thread(target=self.Atualizar).start())
+        janela.bind('<Control-U>', lambda e: Thread(target=self.Atualizar).start())
 
         self.btnDeletar = Button(image=self.deletarimg, command=self.Deletar)
         self.btnDeletar.pack(side=LEFT, padx=1)
-        ttips.Create(self.btnDeletar, text='Deletar')
+        ttips.Create(self.btnDeletar, text='Deletar, CTRL+D')
+        janela.bind('<Control-d>', lambda e: Thread(target=self.Deletar).start())
+        janela.bind('<Control-D>', lambda e: Thread(target=self.Deletar).start())
 
         self.lbCreditos = Label(text='AP Correios - 2020')
         self.lbCreditos.pack(side=TOP)
@@ -135,15 +144,16 @@ class Rastreio(object):
         janela.bind('<Control-L>', self.Limpar)
         janela.bind('<Enter>', Thread(target=CheckUpdates).start())
 
-        janela.bind('<Control-a>', self.NotifAltStatus)
-        janela.bind('<Control-A>', self.NotifAltStatus)
+        janela.bind('<Control-a>', lambda e: Thread(target=self.NotifAltStatus).start())
+        janela.bind('<Control-A>', lambda e: Thread(target=self.NotifAltStatus).start())
         janela.after(1800000, lambda: Thread(target=self.NotifAltStatus).start())
 
     def NotifAltStatus(self, event=None):
+        janela.after(1800000, lambda: Thread(target=self.NotifAltStatus).start())
         try:
             info = showinfo(title='ATUALIZANDO RASTREIOS',
                             message='Atualizando status dos rastreios. Por favor, aguarde...',
-                            detail='Clique em OK e aguarde até esta janela se fechar.\nTodos os objetos não entregues aparecerão na tela principal.')
+                            detail='Clique em OK e aguarde até os objetos não entregues aparecerem na tela principal.')
             rastreio = self.txtRastreio.get()
             objeto = self.txtObjeto.get()
             c.execute('SELECT * FROM rastreio ORDER BY codrastreio')
@@ -155,6 +165,8 @@ class Rastreio(object):
                 last = lastStatus.text.strip().upper()
                 self.campo.delete(1.0, END)
                 if last[0:39] != 'STATUS: OBJETO ENTREGUE AO DESTINATÁRIO':
+                    pendentes = []
+                    pendentes.append(cod)
                     self.campo.config(state='normal')
                     self.campo.insert(INSERT, '-' * 80)
                     self.campo.insert(INSERT, '\n\nALTERAÇÃO DE STATUS')
@@ -164,10 +176,10 @@ class Rastreio(object):
                         ['notify-send', 'AP - Rastreio Correios', f'ALTERAÇÂO DE STATUS\n\n{cod[2]}\n\n{last}\n\n'])
 
         except:
-                subprocess.call(['notify-send', 'AP - Rastreio Correios',
-                                 'Tempo de resposta do servidor execedido.\n\nSem conexão com a internet.'])
-                showerror(title='AVISO',
-                          message='Tempo de resposta do servidor execedido.\n\nSem conexão com a internet.')
+            subprocess.call(['notify-send', 'AP - Rastreio Correios',
+                             'Tempo de resposta do servidor execedido.\n\nSem conexão com a internet.'])
+            showerror(title='AVISO',
+                      message='Tempo de resposta do servidor execedido.\n\nSem conexão com a internet.')
 
     def MenuMouse(self, event):
         w = event.widget
@@ -264,7 +276,7 @@ class Rastreio(object):
         rastreio = self.txtRastreio.get().strip().upper()
 
         if self.txtRastreio.get() == '' or self.txtObjeto.get() == '':
-            aviso = showwarning(title='AVISO', message='Nenhum campo pode estar vazio.')
+            aviso = showwarning(title='AVISO', message='Para salvar digite o rastreio e o nome do objeto.')
 
         elif len(rastreio) != 13:
             aviso = showwarning(title='AVISO', message='Rastreio deve conter 13 dígitos\nsendo duas letras iniciais e '
@@ -401,6 +413,5 @@ janela.resizable(False, False)
 janela.geometry('630x610')
 Rastreio(janela)
 janela.title('AP - RASTREIO CORREIOS v1.0')
-janela.update()
 janela.after(1800000, CheckUpdates)
 janela.mainloop()

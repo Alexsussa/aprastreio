@@ -23,7 +23,7 @@ class Create(object):
                  fgcol="black",
                  fontname="sans-serif",
                  fontsize=10,
-                 showtime=2):
+                 showtime=3):
 
         self.widget = widget
         self.text = text
