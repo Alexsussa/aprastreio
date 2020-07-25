@@ -174,7 +174,8 @@ class Rastreio(object):
                         ['notify-send', 'AP - Rastreio Correios', f'ALTERAÇÂO DE STATUS\n\n{cod[2]}\n\n{last}\n\n'])
 
         except socket.error:
-            subprocess.call(['notify-send', 'AP - Rastreio Correios', 'Tempo de resposta do servidor execedido.\n\nSem conexão com a internet.'])
+            subprocess.call(['notify-send', 'AP - Rastreio Correios',
+                             'Tempo de resposta do servidor execedido.\n\nSem conexão com a internet.'])
             showerror(title='AVISO', message='Tempo de resposta do servidor execedido.\n\nSem conexão com a internet.')
 
     def MenuMouse(self, event):
