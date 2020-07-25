@@ -84,7 +84,6 @@ class Rastreio(object):
         self.btnRastrear = Button(self.c1, text='RASTREAR', fg='black',
                                   command=lambda: {Thread(target=self.Rastrear).start(), self.BuscaRastreio()})
         self.btnRastrear.pack(side=LEFT, padx=2)
-        ttips.Create(self.btnRastrear, text='Rastrear, ENTER')
         janela.bind('<Return>', lambda e: {Thread(target=self.Rastrear).start(), self.BuscaRastreio()})
         janela.bind('<KP_Enter>', lambda e: {Thread(target=self.Rastrear).start(), self.BuscaRastreio()})
 
@@ -149,11 +148,12 @@ class Rastreio(object):
         janela.after(1800000, lambda: Thread(target=self.NotifAltStatus).start())
 
     def NotifAltStatus(self, event=None):
-        janela.after(1800000, lambda: Thread(target=self.NotifAltStatus).start())
         try:
             info = showinfo(title='ATUALIZANDO RASTREIOS',
                             message='Atualizando status dos rastreios. Por favor, aguarde...',
                             detail='Clique em OK e aguarde até os objetos não entregues aparecerem na tela principal.')
+            janela.after(1800000, lambda: Thread(target=self.NotifAltStatus).start())
+            info = 'Atualizando status dos rastreios. Por favor, aguarde...'.center(4105).upper()
             rastreio = self.txtRastreio.get()
             objeto = self.txtObjeto.get()
             c.execute('SELECT * FROM rastreio ORDER BY codrastreio')
@@ -165,8 +165,6 @@ class Rastreio(object):
                 last = lastStatus.text.strip().upper()
                 self.campo.delete(1.0, END)
                 if last[0:39] != 'STATUS: OBJETO ENTREGUE AO DESTINATÁRIO':
-                    pendentes = []
-                    pendentes.append(cod)
                     self.campo.config(state='normal')
                     self.campo.insert(INSERT, '-' * 80)
                     self.campo.insert(INSERT, '\n\nALTERAÇÃO DE STATUS')
@@ -175,11 +173,9 @@ class Rastreio(object):
                     subprocess.call(
                         ['notify-send', 'AP - Rastreio Correios', f'ALTERAÇÂO DE STATUS\n\n{cod[2]}\n\n{last}\n\n'])
 
-        except:
-            subprocess.call(['notify-send', 'AP - Rastreio Correios',
-                             'Tempo de resposta do servidor execedido.\n\nSem conexão com a internet.'])
-            showerror(title='AVISO',
-                      message='Tempo de resposta do servidor execedido.\n\nSem conexão com a internet.')
+        except socket.error:
+            subprocess.call(['notify-send', 'AP - Rastreio Correios', 'Tempo de resposta do servidor execedido.\n\nSem conexão com a internet.'])
+            showerror(title='AVISO', message='Tempo de resposta do servidor execedido.\n\nSem conexão com a internet.')
 
     def MenuMouse(self, event):
         w = event.widget
