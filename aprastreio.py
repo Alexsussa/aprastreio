@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-__version__ = 1.0
+__version__ = 1.1
 
 from tkinter.ttk import *
 from tkinter.messagebox import *
@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from mailcomposer import MailComposer
 from threading import Thread
-from multiprocessing import Process
+from tendo import singleton
 import os
 import sys
 import sqlite3
@@ -23,6 +23,8 @@ import socket
 listaRastreio = []
 
 listaObjeto = []
+
+aprastreio = singleton.SingleInstance()
 
 db = os.path.expanduser('~/Dropbox/aprastreio/banco/')
 if not os.path.exists(db):
@@ -67,6 +69,23 @@ class Rastreio(object):
 
         self.c5 = Frame(master)
         self.c5.pack()
+
+        menubar = Menu(janela)
+
+        arquivo = Menu(menubar, tearoff=0)
+        menubar.add_cascade(label='Arquivo', menu=arquivo)
+        arquivo.add_separator()
+        arquivo.add_command(label='Sincronizar rastreios...', command=lambda: Thread(target=self.NotifAltStatus).start())
+        arquivo.add_command(label='Sair', command=janela.destroy)
+
+        ajuda = Menu(menubar, tearoff=0)
+        menubar.add_cascade(label='Ajuda', menu=ajuda)
+        ajuda.add_separator()
+        ajuda.add_command(label='GitHub AP Rastreio', command=lambda: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')).start())
+        ajuda.add_command(label='Checar atualizações...', command=lambda: Thread(target=CheckUpdates).start())
+        ajuda.add_command(label='Sobre', command=self.Sobre)
+
+        janela.config(menu=menubar)
 
         self.lbRastreio = Label(self.c1, text='RASTREIO:', fg='black')
         self.lbRastreio.pack(side=LEFT)
@@ -145,7 +164,29 @@ class Rastreio(object):
 
         janela.bind('<Control-a>', lambda e: Thread(target=self.NotifAltStatus).start())
         janela.bind('<Control-A>', lambda e: Thread(target=self.NotifAltStatus).start())
-        janela.after(1800000, lambda: Thread(target=self.NotifAltStatus).start())
+
+    def NavLink(self, url):
+        webbrowser.open_new_tab(url)
+
+    def Sobre(self):
+        popup = Toplevel()
+        sobre = Label(popup, text='AP - Rastreios v1.1')
+        sobre.pack(pady=20)
+        mit = Label(popup, text='Licença Mit\n', fg='blue', cursor='hand2')
+        mit.pack()
+        github = Label(popup, text='GitHub\n', fg='blue', cursor='hand2')
+        github.pack()
+        ok = Button(popup, text='OK', command=popup.destroy)
+        ok.pack()
+        popup.title('Sobre')
+        popup.geometry('400x200')
+        popup.resizable(False, False)
+        popup.grab_set()
+        popup.focus_force()
+        popup.transient(janela)
+
+        mit.bind('<Button-1>', lambda e: self.NavLink('https://github.com/Alexsussa/aprastreio/blob/master/LICENSE'))
+        github.bind('<Button-1>', lambda e: self.NavLink('https://github.com/Alexsussa/aprastreio/'))
 
     def NotifAltStatus(self, event=None):
         try:
@@ -153,7 +194,6 @@ class Rastreio(object):
                             message='Atualizando status dos rastreios. Por favor, aguarde...',
                             detail='Clique em OK e aguarde até os objetos não entregues aparecerem na tela principal.')
             janela.after(1800000, lambda: Thread(target=self.NotifAltStatus).start())
-            info = 'Atualizando status dos rastreios. Por favor, aguarde...'.center(4105).upper()
             rastreio = self.txtRastreio.get()
             objeto = self.txtObjeto.get()
             c.execute('SELECT * FROM rastreio ORDER BY codrastreio')
@@ -409,6 +449,6 @@ janela.tk.call('wm', 'iconphoto', janela._w, iconejanela)
 janela.resizable(False, False)
 janela.geometry('630x610')
 Rastreio(janela)
-janela.title('AP - RASTREIO CORREIOS v1.0')
-janela.after(1800000, CheckUpdates)
+janela.title('AP - RASTREIO CORREIOS v1.1')
+janela.update()
 janela.mainloop()
