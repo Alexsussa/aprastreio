@@ -11,7 +11,6 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from mailcomposer import MailComposer
 from threading import Thread
-from tendo import singleton
 import os
 import sys
 import sqlite3
@@ -23,8 +22,6 @@ import socket
 listaRastreio = []
 
 listaObjeto = []
-
-aprastreio = singleton.SingleInstance()
 
 db = os.path.expanduser('~/Dropbox/aprastreio/banco/')
 if not os.path.exists(db):
