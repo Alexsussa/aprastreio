@@ -23,6 +23,14 @@ listaRastreio = []
 
 listaObjeto = []
 
+pid = os.getpid()
+pidfile = '/tmp/aprastreio.pid'
+if not os.path.isfile(pidfile):
+    os.system(f'touch {pidfile}')
+    os.system(f'echo {pid} >> {pidfile}')
+else:
+    sys.exit(-1)
+
 db = os.path.expanduser('~/Dropbox/aprastreio/banco/')
 if not os.path.exists(db):
     os.path.join(os.mkdir(db), 'rastreios.db')
@@ -449,3 +457,5 @@ Rastreio(janela)
 janela.title('AP - RASTREIO CORREIOS v1.1')
 janela.update()
 janela.mainloop()
+if janela.destroy or janela.quit:
+    os.system(f'rm {pidfile}')
