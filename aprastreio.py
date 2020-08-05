@@ -195,28 +195,33 @@ class Rastreio(object):
 
     def NotifAltStatus(self, event=None):
         try:
-            info = showinfo(title='ATUALIZANDO RASTREIOS',
-                            message='Atualizando status dos rastreios. Por favor, aguarde...',
-                            detail='Clique em OK e aguarde até os objetos não entregues aparecerem na tela principal.')
-            janela.after(1800000, lambda: Thread(target=self.NotifAltStatus).start())
-            rastreio = self.txtRastreio.get()
-            objeto = self.txtObjeto.get()
-            c.execute('SELECT * FROM rastreio ORDER BY codrastreio')
-            self.Limpar()
-            for cod in c:
-                linkcorreios = urlopen(f'https://www.linkcorreios.com.br/?id={cod[1]}')
-                soup = BeautifulSoup(linkcorreios, 'html.parser')
-                lastStatus = soup.find('ul', attrs={'class': 'linha_status'})
-                last = lastStatus.text.strip().upper()
-                self.campo.delete(1.0, END)
-                if last[0:39] != 'STATUS: OBJETO ENTREGUE AO DESTINATÁRIO':
-                    self.campo.config(state='normal')
-                    self.campo.insert(INSERT, '-' * 80)
-                    self.campo.insert(INSERT, '\n\nALTERAÇÃO DE STATUS')
-                    self.campo.insert(INSERT, f'\n\n{cod[2]}\n{cod[1]}\n\n{last}\n\n', '-' * 80)
-                    self.campo.config(state='disable')
-                    subprocess.call(
-                        ['notify-send', 'AP - Rastreio Correios', f'ALTERAÇÂO DE STATUS\n\n{cod[2]}\n\n{last}\n\n'])
+            info = askyesno(title='ATUALIZANDO RASTREIOS',
+                            message='Atualizando status dos rastreios...',
+                            detail='Clique em SIM e aguarde até os objetos não entregues aparecerem na tela principal\nou clique em NÃO para atualizar manualmente mais tarde.')
+            if info == False:
+                None
+            else:
+                janela.after(1800000, lambda: Thread(target=self.NotifAltStatus).start())
+                subprocess.call(['notify-send', 'AP - Rastreio Correios', 'Atualizando status dos rastreios...\n\nPor favor, aguarde...'])
+                rastreio = self.txtRastreio.get()
+                objeto = self.txtObjeto.get()
+                c.execute('SELECT * FROM rastreio ORDER BY codrastreio')
+                self.Limpar()
+                for cod in c:
+                    linkcorreios = urlopen(f'https://www.linkcorreios.com.br/?id={cod[1]}')
+                    soup = BeautifulSoup(linkcorreios, 'html.parser')
+                    lastStatus = soup.find('ul', attrs={'class': 'linha_status'})
+                    last = lastStatus.text.strip().upper()
+                    self.campo.delete(1.0, END)
+                    if last[0:39] != 'STATUS: OBJETO ENTREGUE AO DESTINATÁRIO':
+                        self.campo.config(state='normal')
+                        self.campo.insert(INSERT, '-' * 80)
+                        self.campo.insert(INSERT, '\n\nALTERAÇÃO DE STATUS')
+                        self.campo.insert(INSERT, f'\n\n{cod[2]}\n{cod[1]}\n\n{last}\n\n', '-' * 80)
+                        self.campo.config(state='disable')
+                        subprocess.call(
+                            ['notify-send', 'AP - Rastreio Correios', f'ALTERAÇÂO DE STATUS\n\n{cod[2]}\n\n{last}\n\n'])
+                subprocess.call(['notify-send', 'AP - Rastreio Correios', 'Todos os objetos não entregues estão na tela principal.'])
 
         except socket.error:
             subprocess.call(['notify-send', 'AP - Rastreio Correios',
