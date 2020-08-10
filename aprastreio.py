@@ -79,16 +79,24 @@ class Rastreio(object):
 
         arquivo = Menu(menubar, tearoff=0)
         menubar.add_cascade(label='Arquivo', menu=arquivo)
+        menubar.add_separator()
+        arquivo.add_command(label='Sincronizar rastreios...', command=lambda: Thread(target=self.NotifAltStatus).start(), accelerator='Ctrl+A')
+        arquivo.add_command(label='Salvar', command=lambda: Thread(target=self.Cadastrar).start(), accelerator='Ctrl+S')
+        arquivo.add_command(label='Atualizar', command=lambda: Thread(target=self.Atualizar).start(), accelerator='Ctrl+U')
+        arquivo.add_command(label='Deletar', command=lambda: Thread(target=self.Deletar).start(), accelerator='Ctrl+D')
         arquivo.add_separator()
-        arquivo.add_command(label='Sincronizar rastreios...', command=lambda: Thread(target=self.NotifAltStatus).start())
-        arquivo.add_command(label='Sair', command=janela.destroy)
+        arquivo.add_command(label='Sair', command=janela.destroy, accelerator='Ctrl+Q')
+        janela.bind('<Control-q>', self.JanExit)
+        janela.bind('<Control-Q>', self.JanExit)
 
         ajuda = Menu(menubar, tearoff=0)
         menubar.add_cascade(label='Ajuda', menu=ajuda)
-        ajuda.add_separator()
-        ajuda.add_command(label='GitHub AP Rastreio', command=lambda: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')).start())
+        ajuda.add_command(label='GitHub AP Rastreio...', command=lambda: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')).start())
         ajuda.add_command(label='Checar atualizações...', command=lambda: Thread(target=CheckUpdates).start())
-        ajuda.add_command(label='Sobre', command=self.Sobre)
+        ajuda.add_separator()
+        ajuda.add_command(label='Sobre', command=self.Sobre, accelerator='Ctrl+H')
+        janela.bind('<Control-h>', self.Sobre)
+        janela.bind('<Control-H>', self.Sobre)
 
         janela.config(menu=menubar)
 
@@ -170,14 +178,17 @@ class Rastreio(object):
         janela.bind('<Control-a>', lambda e: Thread(target=self.NotifAltStatus).start())
         janela.bind('<Control-A>', lambda e: Thread(target=self.NotifAltStatus).start())
 
+    def JanExit(self, event=None):
+        janela.destroy()
+
     def NavLink(self, url):
         webbrowser.open_new_tab(url)
 
-    def Sobre(self):
+    def Sobre(self, event=None):
         popup = Toplevel()
         sobre = Label(popup, text='AP - Rastreios v1.1')
         sobre.pack(pady=20)
-        mit = Label(popup, text='Licença Mit\n', fg='blue', cursor='hand2')
+        mit = Label(popup, text='Licença\n', fg='blue', cursor='hand2')
         mit.pack()
         github = Label(popup, text='GitHub\n', fg='blue', cursor='hand2')
         github.pack()
@@ -190,8 +201,8 @@ class Rastreio(object):
         popup.focus_force()
         popup.transient(janela)
 
-        mit.bind('<Button-1>', lambda e: self.NavLink('https://github.com/Alexsussa/aprastreio/blob/master/LICENSE'))
-        github.bind('<Button-1>', lambda e: self.NavLink('https://github.com/Alexsussa/aprastreio/'))
+        mit.bind('<Button-1>', lambda e: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/blob/master/LICENSE')).start())
+        github.bind('<Button-1>', lambda e: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')).start())
 
     def NotifAltStatus(self, event=None):
         try:
@@ -201,7 +212,7 @@ class Rastreio(object):
             if info == False:
                 None
             else:
-                janela.after(1800000, lambda: Thread(target=self.NotifAltStatus).start())
+                janela.after(3600000, lambda: Thread(target=self.NotifAltStatus).start())
                 subprocess.call(['notify-send', 'AP - Rastreio Correios', 'Atualizando status dos rastreios...\n\nPor favor, aguarde...'])
                 rastreio = self.txtRastreio.get()
                 objeto = self.txtObjeto.get()
