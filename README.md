@@ -2,6 +2,7 @@
 
 O AP Rastreio é um software de uso simples para rastrear encomendas dos Correios.
 Também podendo salvar o rastreio e o nome do objeto em um banco de dados local.
+O banco de dados local é salvo em uma pasta dentro do Dropbox, ou seja, caso você tenha o Dropbox instalado em sua máquina automaticamente será sincronizado o banco de dados na nuvem aonde poderá acessar mais de uma máquina.
 Você também estará podendo enviar o rastreio via email ou WhatsApp.
 
 Modo de uso:
