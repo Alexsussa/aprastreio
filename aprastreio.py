@@ -33,7 +33,12 @@ else:
 
 db = os.path.expanduser('~/Dropbox/aprastreio/banco/')
 if not os.path.exists(db):
-    os.path.join(os.mkdir(db), 'rastreios.db')
+    os.makedirs(db)
+    banco = os.path.join(os.path.dirname(db), 'rastreios.db')
+    conexao = sqlite3.connect(banco, check_same_thread=False)
+    c = conexao.cursor()
+    c.execute('CREATE TABLE IF NOT EXISTS rastreio (id INTEGER PRIMARY KEY AUTOINCREMENT,'
+              'codrastreio TEXT VARCHAR(13) UNIQUE NOT NULL, objeto TEXT VARCHAR(50) NOT NULL)')
 else:
     banco = os.path.join(os.path.dirname(db), 'rastreios.db')
     conexao = sqlite3.connect(banco, check_same_thread=False)
@@ -137,25 +142,25 @@ class Rastreio(object):
 
         self.btnEmail = Button(image=self.emailimg, command=lambda: Thread(target=self.Email).start())
         self.btnEmail.pack(side=RIGHT)
-        ttips.Create(self.btnEmail, text='Enviar por Email, CTRL+E')
+        ttips.Create(self.btnEmail, text='Enviar por Email, Ctrl+E')
         janela.bind('<Control-e>', lambda e: Thread(target=self.Email).start())
         janela.bind('<Control-E>', lambda e: Thread(target=self.Email).start())
 
         self.btnSalvar = Button(image=self.salvarimg, command=lambda: [self.RastreioExiste(), self.Cadastrar()])
         self.btnSalvar.pack(side=LEFT, padx=1)
-        ttips.Create(self.btnSalvar, text='Salvar, CTRL+S')
+        ttips.Create(self.btnSalvar, text='Salvar, Ctrl+S')
         janela.bind('<Control-s>', lambda e: Thread(target=self.Cadastrar).start())
         janela.bind('<Control-S>', lambda e: Thread(target=self.Cadastrar).start())
 
         self.btnAtualizar = Button(image=self.atualizarimg, command=self.Atualizar)
         self.btnAtualizar.pack(side=LEFT, padx=1)
-        ttips.Create(self.btnAtualizar, text='Atualizar, CTRL+U')
+        ttips.Create(self.btnAtualizar, text='Atualizar, Ctrl+U')
         janela.bind('<Control-u>', lambda e: Thread(target=self.Atualizar).start())
         janela.bind('<Control-U>', lambda e: Thread(target=self.Atualizar).start())
 
         self.btnDeletar = Button(image=self.deletarimg, command=self.Deletar)
         self.btnDeletar.pack(side=LEFT, padx=1)
-        ttips.Create(self.btnDeletar, text='Deletar, CTRL+D')
+        ttips.Create(self.btnDeletar, text='Deletar, Ctrl+D')
         janela.bind('<Control-d>', lambda e: Thread(target=self.Deletar).start())
         janela.bind('<Control-D>', lambda e: Thread(target=self.Deletar).start())
 
