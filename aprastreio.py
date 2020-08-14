@@ -332,7 +332,7 @@ class Rastreio(object):
             rastreio = self.txtRastreio.get()
             mc.subject = f'Código de Rastreio ({rastreio})'
             mc.body = f'Boa tarde!\n\n Segue código de rastreio para acompanhamento do seu pedido:\n\n https://www.linkcorreios.com.br/?id={rastreio}.\n\n'
-            mc.display('Megatecshop - Rastreio Correios')
+            mc.display('AP - Rastreio Correios')
             # webbrowser.open(f'https://www.linkcorreios.com.br/?id={rastreio}#envie_por_email')
 
     def Cadastrar(self):
