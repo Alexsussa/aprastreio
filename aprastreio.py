@@ -107,13 +107,13 @@ class Rastreio(object):
 
         self.lbRastreio = Label(self.c1, text='RASTREIO:', fg='black')
         self.lbRastreio.pack(side=LEFT)
-        self.txtRastreio = Entry(self.c1, width=15, bg='white', fg='black', selectbackground='blue',
+        self.txtRastreio = Entry(self.c1, width=14, bg='white', fg='black', selectbackground='blue',
                                  selectforeground='white')
         self.txtRastreio.pack(side=LEFT, padx=2)
 
         self.lbObjeto = Label(self.c1, text='OBJETO:', fg='black')
         self.lbObjeto.pack(side=LEFT)
-        self.txtObjeto = Combobox(self.c1, width=30, background='white', foreground='black',
+        self.txtObjeto = Combobox(self.c1, width=32, background='white', foreground='black',
                                   values=self.ListaObjetos(event='<Button-1>'))
         self.txtObjeto.pack(side=LEFT, padx=2)
         janela.bind('<<ComboboxSelected>>', self.Busca)
