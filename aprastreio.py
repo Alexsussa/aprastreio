@@ -129,7 +129,7 @@ class Rastreio:
         janela.bind('<KP_Enter>', lambda e: {Thread(target=self.Rastrear).start(), self.BuscaRastreio()})
 
         self.campo = ScrolledText(self.c2, width=77, height=30, bg='lightgray', fg='black', state='disable',
-                          selectbackground='blue', font=('sans-serif', '10'), yscrollcommand='')
+                          selectbackground='blue', font=('sans-serif', '10'))
         self.campo.pack(fill='both', expand=True, pady=5)
 
         self.whatsappimg = PhotoImage(file='imagens/WhatsApp.png')
