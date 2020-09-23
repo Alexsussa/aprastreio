@@ -5,7 +5,7 @@ __version__ = 1.1
 
 from tkinter.ttk import *
 from tkinter.messagebox import *
-from tkinter.filedialog import *
+from tkinter.scrolledtext import *
 from tkinter import *
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
@@ -128,8 +128,8 @@ class Rastreio:
         janela.bind('<Return>', lambda e: {Thread(target=self.Rastrear).start(), self.BuscaRastreio()})
         janela.bind('<KP_Enter>', lambda e: {Thread(target=self.Rastrear).start(), self.BuscaRastreio()})
 
-        self.campo = Text(self.c2, width=77, height=30, bg='lightgray', fg='black', state='disable',
-                          selectbackground='blue', font=('sans-serif', '10'))
+        self.campo = ScrolledText(self.c2, width=77, height=30, bg='lightgray', fg='black', state='disable',
+                          selectbackground='blue', font=('sans-serif', '10'), yscrollcommand='')
         self.campo.pack(fill='both', expand=True, pady=5)
 
         self.whatsappimg = PhotoImage(file='imagens/WhatsApp.png')
