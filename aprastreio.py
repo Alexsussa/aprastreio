@@ -57,7 +57,7 @@ def CheckUpdates(event=None):
         webbrowser.open('https://github.com/Alexsussa/aprastreio/releases/')
 
 
-class Rastreio(object):
+class Rastreio:
     def __init__(self, master=None, rastreio='', objeto=''):
 
         self.rastreio = rastreio
@@ -96,12 +96,16 @@ class Rastreio(object):
 
         ajuda = Menu(menubar, tearoff=0)
         menubar.add_cascade(label='Ajuda', menu=ajuda)
-        ajuda.add_command(label='GitHub AP Rastreio...', command=lambda: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')).start())
-        ajuda.add_command(label='Checar atualizações...', command=lambda: Thread(target=CheckUpdates).start())
+        ajuda.add_command(label='GitHub AP Rastreio...', command=lambda: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')).start(), accelerator='Ctrl+G')
+        ajuda.add_command(label='Checar atualizações...', command=lambda: Thread(target=CheckUpdates).start(), accelerator='Ctrl+R')
         ajuda.add_separator()
         ajuda.add_command(label='Sobre', command=self.Sobre, accelerator='Ctrl+H')
         janela.bind('<Control-h>', self.Sobre)
         janela.bind('<Control-H>', self.Sobre)
+        janela.bind('<Control-g>', lambda e: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')))
+        janela.bind('<Control-G>', lambda e: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')))
+        janela.bind('<Control-r>', CheckUpdates)
+        janela.bind('<Control-R>', CheckUpdates)
 
         janela.config(menu=menubar)
 
@@ -193,6 +197,10 @@ class Rastreio(object):
         popup = Toplevel()
         sobre = Label(popup, text='AP - Rastreios v1.1')
         sobre.pack(pady=20)
+        logo = PhotoImage(file='imagens/sobre.png')
+        bgimg = Label(popup, image=logo)
+        bgimg.pack()
+        bgimg.image = logo
         mit = Label(popup, text='Licença\n', fg='blue', cursor='hand2')
         mit.pack()
         github = Label(popup, text='GitHub\n', fg='blue', cursor='hand2')
@@ -200,7 +208,7 @@ class Rastreio(object):
         ok = Button(popup, text='OK', command=popup.destroy)
         ok.pack()
         popup.title('Sobre')
-        popup.geometry('400x200')
+        popup.geometry('400x350')
         popup.resizable(False, False)
         popup.grab_set()
         popup.focus_force()
@@ -210,12 +218,13 @@ class Rastreio(object):
         github.bind('<Button-1>', lambda e: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')).start())
 
     def NotifAltStatus(self, event=None):
+        texto = 'O rastreamento não está disponível no momento:\n\n- Verifique se o código do objeto está correto;\n- O objeto pode demorar até 24 horas (após postagem) para ser rastreado no sistema dos Correios.'.strip().upper()
         try:
             info = askyesno(title='ATUALIZANDO RASTREIOS',
                             message='Atualizando status dos rastreios...',
                             detail='Clique em SIM e aguarde até os objetos não entregues aparecerem na tela principal\nou clique em NÃO para atualizar manualmente mais tarde.')
             if info == False:
-                None
+                pass
             else:
                 janela.after(3600000, lambda: Thread(target=self.NotifAltStatus).start())
                 subprocess.call(['notify-send', 'AP - Rastreio Correios', 'Atualizando status dos rastreios...\n\nPor favor, aguarde...'])
@@ -315,6 +324,7 @@ class Rastreio(object):
                 f'https://web.whatsapp.com/send?phone=&text=Ol%c3%a1.%20Clique%20no%20link%20para%20rastrear%20o%20objeto%20c%c3%b3digo%20{rastreio}%0ahttps%3a%2f%2fwww.linkcorreios.com.br%2f{rastreio}%3fw%3d1&source=&data=')
 
     def Email(self):
+        rastreio = self.txtRastreio.get().strip().upper()
         if not os.path.exists('/usr/bin/thunderbird') and not os.path.exists('/usr/bin/evolution'):
             aviso = showwarning(title='AVISO', message='Nenhum cliente de email está instalado em seu computador.')
         else:
