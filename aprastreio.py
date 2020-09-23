@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 
-__version__ = 1.1
+__version__ = 1.2
 
 from tkinter.ttk import *
 from tkinter.messagebox import *
@@ -195,7 +195,7 @@ class Rastreio:
 
     def Sobre(self, event=None):
         popup = Toplevel()
-        sobre = Label(popup, text='AP - Rastreios v1.1')
+        sobre = Label(popup, text='AP - Rastreios v1.2')
         sobre.pack(pady=20)
         logo = PhotoImage(file='imagens/sobre.png')
         bgimg = Label(popup, image=logo)
@@ -218,7 +218,6 @@ class Rastreio:
         github.bind('<Button-1>', lambda e: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')).start())
 
     def NotifAltStatus(self, event=None):
-        texto = 'O rastreamento não está disponível no momento:\n\n- Verifique se o código do objeto está correto;\n- O objeto pode demorar até 24 horas (após postagem) para ser rastreado no sistema dos Correios.'.strip().upper()
         try:
             info = askyesno(title='ATUALIZANDO RASTREIOS',
                             message='Atualizando status dos rastreios...',
@@ -485,7 +484,7 @@ janela.tk.call('wm', 'iconphoto', janela._w, iconejanela)
 janela.resizable(False, False)
 janela.geometry('630x610')
 Rastreio(janela)
-janela.title('AP - RASTREIO CORREIOS v1.1')
+janela.title('AP - RASTREIO CORREIOS v1.2')
 janela.update()
 janela.mainloop()
 if janela.destroy or janela.quit:
