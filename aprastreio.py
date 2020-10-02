@@ -21,8 +21,17 @@ import socket
 
 listaRastreio = []
 
-listaObjeto = []
+listaPendentes = []
 
+listaEntregues = []
+
+listaTodos = []
+
+listaSepararEntregues = []
+
+listaSepararPendentes = []
+
+# Evita que o programa abra novamente enquanto enquanto ele já estiver aberto
 pid = os.getpid()
 pidfile = '/tmp/aprastreio.pid'
 if not os.path.isfile(pidfile):
@@ -31,6 +40,7 @@ if not os.path.isfile(pidfile):
 else:
     sys.exit(-1)
 
+# Cria o banco de dados caso ele não exista
 db = os.path.expanduser('~/Dropbox/aprastreio/banco/')
 if not os.path.exists(db):
     os.makedirs(db)
@@ -39,21 +49,29 @@ if not os.path.exists(db):
     c = conexao.cursor()
     c.execute('CREATE TABLE IF NOT EXISTS rastreio (id INTEGER PRIMARY KEY AUTOINCREMENT,'
               'codrastreio TEXT VARCHAR(13) UNIQUE NOT NULL, objeto TEXT VARCHAR(50) NOT NULL)')
+    c.execute('CREATE TABLE IF NOT EXISTS entregues (id INTEGER PRIMARY KEY AUTOINCREMENT,'
+              'codrastreio TEXT VARCHAR(13) UNIQUE NOT NULL, objeto TEXT VARCHAR(50) NOT NULL)')
+    c.execute('CREATE TABLE IF NOT EXISTS pendentes (id INTEGER PRIMARY KEY AUTOINCREMENT,'
+              'codrastreio TEXT VARCHAR(13) UNIQUE NOT NULL, objeto TEXT VARCHAR(50) NOT NULL)')
 else:
     banco = os.path.join(os.path.dirname(db), 'rastreios.db')
     conexao = sqlite3.connect(banco, check_same_thread=False)
     c = conexao.cursor()
     c.execute('CREATE TABLE IF NOT EXISTS rastreio (id INTEGER PRIMARY KEY AUTOINCREMENT,'
               'codrastreio TEXT VARCHAR(13) UNIQUE NOT NULL, objeto TEXT VARCHAR(50) NOT NULL)')
+    c.execute('CREATE TABLE IF NOT EXISTS entregues (id INTEGER PRIMARY KEY AUTOINCREMENT,'
+              'codrastreio TEXT VARCHAR(13) UNIQUE NOT NULL, objeto TEXT VARCHAR(50) NOT NULL)')
+    c.execute('CREATE TABLE IF NOT EXISTS pendentes (id INTEGER PRIMARY KEY AUTOINCREMENT,'
+              'codrastreio TEXT VARCHAR(13) UNIQUE NOT NULL, objeto TEXT VARCHAR(50) NOT NULL)')
 
-
+# Procura novas versões do software
 def CheckUpdates(event=None):
     janela.unbind('<Enter>')
     versao = urlopen('https://www.dropbox.com/s/61rpf1xg8qr1vh1/version_linux.txt?dl=true').read()
     if float(versao) > float(__version__):
         subprocess.call(
             ['notify-send', 'AP - Rastreio Correios', 'Há uma nova versão disponível. Baixe agora!'])
-        info = showinfo(title='Atualização', message='Há uma nova versão disponível. Baixe agora!')
+        showinfo(title='Atualização', message='Há uma nova versão disponível. Baixe agora!')
         webbrowser.open('https://github.com/Alexsussa/aprastreio/releases/')
 
 
@@ -80,15 +98,33 @@ class Rastreio:
         self.c5 = Frame(master)
         self.c5.pack()
 
+        # Menu superior
         menubar = Menu(janela)
 
         arquivo = Menu(menubar, tearoff=0)
         menubar.add_cascade(label='Arquivo', menu=arquivo)
         menubar.add_separator()
-        arquivo.add_command(label='Sincronizar rastreios...', command=lambda: Thread(target=self.NotifAltStatus).start(), accelerator='Ctrl+A')
+        arquivo.add_command(label='Sincronizar rastreios...',
+                            command=lambda: Thread(target=self.NotifAltStatus).start(), accelerator='Ctrl+R')
+        # arquivo.add_command(label='Arquivar entregues', command=lambda: Thread(target=self.arquivarEntregues).start(), accelerator='Ctrl+B')
+        arquivo.add_command(label='Mover para entregues', command=lambda: Thread(target=self.arquivarRastreio).start(),
+                            accelerator='Ctrl+B')
         arquivo.add_command(label='Salvar', command=lambda: Thread(target=self.Cadastrar).start(), accelerator='Ctrl+S')
-        arquivo.add_command(label='Atualizar', command=lambda: Thread(target=self.Atualizar).start(), accelerator='Ctrl+U')
+        arquivo.add_command(label='Atualizar', command=lambda: Thread(target=self.Atualizar).start(),
+                            accelerator='Ctrl+U')
         arquivo.add_command(label='Deletar', command=lambda: Thread(target=self.Deletar).start(), accelerator='Ctrl+D')
+        arquivo.add_separator()
+        arquivo.add_command(label='Mostrar todos os rastreios',
+                            command=lambda: {self.txtObjeto.config(values=self.listaTodos(event='<Button-1>')),
+                                             janela.bind('<<ComboboxSelected>>', self.BuscaTodos)})
+
+        arquivo.add_command(label='Mostar apenas os entregues',
+                            command=lambda: {self.txtObjeto.config(values=self.listaEntregues(event='<Button-1>')),
+                                             janela.bind('<<ComboboxSelected>>', self.BuscaEntregues)})
+
+        """arquivo.add_command(label='Mostar apenas os pendentes',
+                            command=lambda: {self.txtObjeto.config(values=self.listaPendentes(event='<Button-1>')),
+                                             janela.bind('<<ComboboxSelected>>', self.BuscaPendentes)})"""
         arquivo.add_separator()
         arquivo.add_command(label='Sair', command=janela.destroy, accelerator='Ctrl+Q')
         janela.bind('<Control-q>', self.JanExit)
@@ -96,19 +132,24 @@ class Rastreio:
 
         ajuda = Menu(menubar, tearoff=0)
         menubar.add_cascade(label='Ajuda', menu=ajuda)
-        ajuda.add_command(label='GitHub AP Rastreio...', command=lambda: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')).start(), accelerator='Ctrl+G')
-        ajuda.add_command(label='Checar atualizações...', command=lambda: Thread(target=CheckUpdates).start(), accelerator='Ctrl+R')
+        ajuda.add_command(label='GitHub AP Rastreio...', command=lambda: Thread(
+            target=self.NavLink('https://github.com/Alexsussa/aprastreio/')).start(), accelerator='Ctrl+G')
+        ajuda.add_command(label='Checar atualizações...', command=lambda: Thread(target=CheckUpdates).start(),
+                          accelerator='Ctrl+K')
         ajuda.add_separator()
         ajuda.add_command(label='Sobre', command=self.Sobre, accelerator='Ctrl+H')
         janela.bind('<Control-h>', self.Sobre)
         janela.bind('<Control-H>', self.Sobre)
         janela.bind('<Control-g>', lambda e: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')))
         janela.bind('<Control-G>', lambda e: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')))
-        janela.bind('<Control-r>', CheckUpdates)
-        janela.bind('<Control-R>', CheckUpdates)
+        janela.bind('<Control-k>', CheckUpdates)
+        janela.bind('<Control-K>', CheckUpdates)
+        janela.bind('<Control-b>', lambda e: Thread(target=self.arquivarRastreio).start())
+        janela.bind('<Control-B>', lambda e: Thread(target=self.arquivarRastreio).start())
 
         janela.config(menu=menubar)
 
+        # Layout do programa
         self.lbRastreio = Label(self.c1, text='RASTREIO:', fg='black')
         self.lbRastreio.pack(side=LEFT)
         self.txtRastreio = Entry(self.c1, width=14, bg='white', fg='black', selectbackground='blue',
@@ -118,9 +159,9 @@ class Rastreio:
         self.lbObjeto = Label(self.c1, text='OBJETO:', fg='black')
         self.lbObjeto.pack(side=LEFT)
         self.txtObjeto = Combobox(self.c1, width=32, background='white', foreground='black',
-                                  values=self.ListaObjetos(event='<Button-1>'))
+                                  values=self.listaTodos(event='<Button-1>'))
         self.txtObjeto.pack(side=LEFT, padx=2)
-        janela.bind('<<ComboboxSelected>>', self.Busca)
+        janela.bind('<<ComboboxSelected>>', self.BuscaTodos)
 
         self.btnRastrear = Button(self.c1, text='RASTREAR', fg='black',
                                   command=lambda: {Thread(target=self.Rastrear).start(), self.BuscaRastreio()})
@@ -129,7 +170,7 @@ class Rastreio:
         janela.bind('<KP_Enter>', lambda e: {Thread(target=self.Rastrear).start(), self.BuscaRastreio()})
 
         self.campo = ScrolledText(self.c2, width=77, height=30, bg='lightgray', fg='black', state='disable',
-                          selectbackground='blue', font=('sans-serif', '10'))
+                                  selectbackground='blue', font=('sans-serif', '10'))
         self.campo.pack(fill='both', expand=True, pady=5)
 
         self.whatsappimg = PhotoImage(file='imagens/WhatsApp.png')
@@ -178,15 +219,30 @@ class Rastreio:
         self.mouseMenu.add_command(label='Recortar')
         self.mouseMenu.add_command(label='Copiar')
         self.mouseMenu.add_command(label='Colar')
-        janela.bind('<Button-3><ButtonRelease-3>', self.MenuMouse)
 
-        janela.bind('<Control-l>', self.Limpar)
         janela.bind('<Control-L>', self.Limpar)
         janela.bind('<Enter>', Thread(target=CheckUpdates).start())
 
-        janela.bind('<Control-a>', lambda e: Thread(target=self.NotifAltStatus).start())
-        janela.bind('<Control-A>', lambda e: Thread(target=self.NotifAltStatus).start())
+        janela.bind('<Control-r>', lambda e: Thread(target=self.NotifAltStatus).start())
+        janela.bind('<Control-R>', lambda e: Thread(target=self.NotifAltStatus).start())
 
+    # Move rastreio para a lista de entregues
+    def arquivarRastreio(self):
+        rastreio = self.txtRastreio.get()
+        objeto = self.txtObjeto.get()
+        if rastreio == '' or objeto == '':
+            showwarning(title='Aviso', message='Selecione um rastreio para mover.')
+        else:
+            c.execute(f'SELECT codrastreio FROM rastreio WHERE codrastreio = "{rastreio}"')
+            c.execute(f'INSERT INTO entregues SELECT * FROM rastreio WHERE codrastreio = "{rastreio}"')
+            c.execute(f'DELETE FROM rastreio WHERE codrastreio = "{rastreio}"')
+            conexao.commit()
+            listaTodos.clear()
+            self.txtObjeto.config(values=self.listaTodos())
+            self.Limpar()
+            showinfo(title='Status', message=f'Rastreio {rastreio} arquivado.')
+
+    # Fecha o programa principal
     def JanExit(self, event=None):
         janela.destroy()
 
@@ -205,18 +261,19 @@ class Rastreio:
         mit.pack()
         github = Label(popup, text='GitHub\n', fg='blue', cursor='hand2')
         github.pack()
-        ok = Button(popup, text='OK', command=popup.destroy)
-        ok.pack()
         popup.title('Sobre')
-        popup.geometry('400x350')
+        popup.geometry('400x300')
         popup.resizable(False, False)
         popup.grab_set()
         popup.focus_force()
         popup.transient(janela)
 
-        mit.bind('<Button-1>', lambda e: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/blob/master/LICENSE')).start())
-        github.bind('<Button-1>', lambda e: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')).start())
+        mit.bind('<Button-1>', lambda e: Thread(
+            target=self.NavLink('https://github.com/Alexsussa/aprastreio/blob/master/LICENSE')).start())
+        github.bind('<Button-1>',
+                    lambda e: Thread(target=self.NavLink('https://github.com/Alexsussa/aprastreio/')).start())
 
+    # Notificação de alteração de status dos rastreios
     def NotifAltStatus(self, event=None):
         try:
             info = askyesno(title='ATUALIZANDO RASTREIOS',
@@ -226,9 +283,8 @@ class Rastreio:
                 pass
             else:
                 janela.after(3600000, lambda: Thread(target=self.NotifAltStatus).start())
-                subprocess.call(['notify-send', 'AP - Rastreio Correios', 'Atualizando status dos rastreios...\n\nPor favor, aguarde...'])
-                rastreio = self.txtRastreio.get()
-                objeto = self.txtObjeto.get()
+                subprocess.call(['notify-send', 'AP - Rastreio Correios',
+                                 'Atualizando status dos rastreios...\n\nPor favor, aguarde...'])
                 c.execute('SELECT * FROM rastreio ORDER BY codrastreio')
                 self.Limpar()
                 for cod in c:
@@ -245,7 +301,8 @@ class Rastreio:
                         self.campo.config(state='disable')
                         subprocess.call(
                             ['notify-send', 'AP - Rastreio Correios', f'ALTERAÇÂO DE STATUS\n\n{cod[2]}\n\n{last}\n\n'])
-                subprocess.call(['notify-send', 'AP - Rastreio Correios', 'Todos os objetos não entregues estão na tela principal.'])
+                subprocess.call(['notify-send', 'AP - Rastreio Correios',
+                                 'Todos os objetos não entregues estão na tela principal.'])
 
         except socket.error:
             subprocess.call(['notify-send', 'AP - Rastreio Correios',
@@ -263,10 +320,10 @@ class Rastreio:
         rastreio = self.txtRastreio.get()
         objeto = self.txtObjeto.get()
         if rastreio == '':
-            aviso = showwarning(title='AVISO', message='Digite um código de rastreio para rastrear.')
+            showwarning(title='AVISO', message='Digite um código de rastreio para rastrear.')
 
         elif len(rastreio) != 13:
-            aviso = showwarning(title='AVISO', message='Rastreio deve conter 13 dígitos\nsendo duas letras iniciais e '
+            showwarning(title='AVISO', message='Rastreio deve conter 13 dígitos\nsendo duas letras iniciais e '
                                                        'duas letras finais, como no\nexemplo abaixo:\n\n "OJ123456789BR"')
 
         else:
@@ -311,10 +368,10 @@ class Rastreio:
         rastreio = self.txtRastreio.get().strip().upper()
 
         if rastreio == '':
-            erro = showerror(title='AVISO', message='Para fazer o envio pelo WhatsApp, primeiro busque pelo rastreio.')
+            showerror(title='AVISO', message='Para fazer o envio pelo WhatsApp, primeiro busque pelo rastreio.')
 
         elif len(rastreio) != 13:
-            aviso = showwarning(title='AVISO', message='Rastreio deve conter 13 dígitos\nsendo duas letras iniciais e '
+            showwarning(title='AVISO', message='Rastreio deve conter 13 dígitos\nsendo duas letras iniciais e '
                                                        'duas letras finais, como no\nexemplo abaixo:\n\n "OJ123456789BR"')
 
         else:
@@ -325,15 +382,15 @@ class Rastreio:
     def Email(self):
         rastreio = self.txtRastreio.get().strip().upper()
         if not os.path.exists('/usr/bin/thunderbird') and not os.path.exists('/usr/bin/evolution'):
-            aviso = showwarning(title='AVISO', message='Nenhum cliente de email está instalado em seu computador.')
+            showwarning(title='AVISO', message='Nenhum cliente de email está instalado em seu computador.')
         else:
             rastreio = self.txtRastreio.get().strip().upper()
 
         if rastreio == '':
-            erro = showerror(title='AVISO', message='Para fazer o envio pelo Email, primeiro busque pelo rastreio.')
+            showerror(title='AVISO', message='Para fazer o envio pelo Email, primeiro busque pelo rastreio.')
 
         elif len(rastreio) != 13:
-            aviso = showwarning(title='AVISO', message='Rastreio deve conter 13 dígitos\nsendo duas letras iniciais e '
+            showwarning(title='AVISO', message='Rastreio deve conter 13 dígitos\nsendo duas letras iniciais e '
                                                        'duas letras finais, como no\nexemplo abaixo:\n\n "OJ123456789BR"')
 
         else:
@@ -348,10 +405,10 @@ class Rastreio:
         rastreio = self.txtRastreio.get().strip().upper()
 
         if self.txtRastreio.get() == '' or self.txtObjeto.get() == '':
-            aviso = showwarning(title='AVISO', message='Para salvar digite o rastreio e o nome do objeto.')
+            showwarning(title='AVISO', message='Para salvar digite o rastreio e o nome do objeto.')
 
         elif len(rastreio) != 13:
-            aviso = showwarning(title='AVISO', message='Rastreio deve conter 13 dígitos\nsendo duas letras iniciais e '
+            showwarning(title='AVISO', message='Rastreio deve conter 13 dígitos\nsendo duas letras iniciais e '
                                                        'duas letras finais, como no\nexemplo abaixo:\n\n "OJ123456789BR"')
 
         else:
@@ -362,17 +419,17 @@ class Rastreio:
 
             self.txtRastreio.delete(0, END)
             self.txtObjeto.delete(0, END)
-            listaObjeto.clear()
-            self.txtObjeto.config(values=self.ListaObjetos())
+            listaPendentes.clear()
+            self.txtObjeto.config(values=self.listaPendentes())
 
-            status = showinfo(title='STATUS', message=f'Rastreio {rastreio} cadastrado com sucesso.')
+            showinfo(title='STATUS', message=f'Rastreio {rastreio} cadastrado com sucesso.')
 
     def Atualizar(self):
         rastreio = self.txtRastreio.get().strip().upper()
         objeto = self.txtObjeto.get().strip().upper()
 
         if self.txtRastreio.get() == '' or self.txtObjeto.get() == '':
-            status = showerror(title='AVISO', message='Para atualizar os dados procure pelo rastreio primeiro.')
+            showerror(title='AVISO', message='Para atualizar os dados procure pelo rastreio primeiro.')
 
         else:
             aviso = askyesno(title='AVISO', message='Você deseja atualizar os dados desse rastreio?')
@@ -387,10 +444,10 @@ class Rastreio:
 
                 self.txtRastreio.delete(0, END)
                 self.txtObjeto.delete(0, END)
-                listaObjeto.clear()
-                self.txtObjeto.config(values=self.ListaObjetos())
+                listaPendentes.clear()
+                self.txtObjeto.config(values=self.listaPendentes())
 
-                status = showinfo(title='STATUS', message=f'Rastreio {rastreio} atualizado com sucesso.')
+                showinfo(title='STATUS', message=f'Rastreio {rastreio} atualizado com sucesso.')
 
             else:
                 return None
@@ -399,7 +456,7 @@ class Rastreio:
         rastreio = self.txtRastreio.get().strip().upper()
 
         if self.txtRastreio.get() == '' or self.txtObjeto.get() == '':
-            status = showerror(title='AVISO', message='Para deletar os dados procure pelo rastreio primeiro.')
+            showerror(title='AVISO', message='Para deletar os dados procure pelo rastreio primeiro.')
 
         else:
             aviso = askyesno(title='AVISO', message='Você realmente deseja DELETAR os dados desse rastreio?\n'
@@ -414,20 +471,37 @@ class Rastreio:
 
                 self.txtRastreio.delete(0, END)
                 self.txtObjeto.delete(0, END)
-                listaObjeto.clear()
-                self.txtObjeto.config(values=self.ListaObjetos())
+                listaPendentes.clear()
+                self.txtObjeto.config(values=self.listaPendentes())
 
-                status = showinfo(title='STATUS', message=f'Rastreio {rastreio} deletado com sucesso.')
+                showinfo(title='STATUS', message=f'Rastreio {rastreio} deletado com sucesso.')
 
             else:
                 return None
 
-    def ListaObjetos(self, event=None):
+    def listaTodos(self, event=None):
         c.execute(f'SELECT objeto FROM rastreio ORDER BY id')
         for objeto in c:
-            if objeto[0] not in listaObjeto:
-                listaObjeto.append(objeto[0])
-        return tuple(reversed(listaObjeto))
+            if objeto[0] not in listaTodos:
+                listaTodos.append(objeto[0])
+        return tuple(reversed(listaTodos))
+
+    def listaPendentes(self, event=None):
+        self.txtObjeto.insert(INSERT, 'Mostrando apenas objetos pendentes')
+        self.Limpar()
+        c.execute(f'SELECT objeto FROM pendentes ORDER BY id')
+        for objeto in c:
+            if objeto[0] not in listaPendentes:
+                listaPendentes.append(objeto[0])
+        return tuple(reversed(listaPendentes))
+
+    def listaEntregues(self, event=None):
+        self.Limpar()
+        c.execute(f'SELECT objeto FROM entregues ORDER BY id')
+        for objeto in c:
+            if objeto[0] not in listaEntregues:
+                listaEntregues.append(objeto[0])
+        return tuple(reversed(listaEntregues))
 
     def ListaRastreio(self, event=None):
         c.execute(f'SELECT codrastreio FROM rastreio ORDER BY codrastreio')
@@ -436,9 +510,35 @@ class Rastreio:
                 listaRastreio.append(rastreio[0])
         return tuple(listaRastreio)
 
-    def Busca(self, event=None):
+    def BuscaPendentes(self, event=None):
+        objeto = self.txtObjeto.get().strip().upper()
+        c.execute(f'SELECT * FROM pendentes WHERE objeto = "{objeto}"')
+
+        for linha in c:
+            self.rastreio = linha[1]
+            self.objeto = linha[2]
+
+            self.txtRastreio.delete(0, END)
+            self.txtRastreio.insert(INSERT, self.rastreio)
+            self.txtObjeto.delete(0, END)
+            self.txtObjeto.insert(INSERT, self.objeto)
+
+    def BuscaTodos(self, event=None):
         objeto = self.txtObjeto.get().strip().upper()
         c.execute(f'SELECT * FROM rastreio WHERE objeto = "{objeto}"')
+
+        for linha in c:
+            self.rastreio = linha[1]
+            self.objeto = linha[2]
+
+            self.txtRastreio.delete(0, END)
+            self.txtRastreio.insert(INSERT, self.rastreio)
+            self.txtObjeto.delete(0, END)
+            self.txtObjeto.insert(INSERT, self.objeto)
+
+    def BuscaEntregues(self, event=None):
+        objeto = self.txtObjeto.get().strip().upper()
+        c.execute(f'SELECT * FROM entregues WHERE objeto = "{objeto}"')
 
         for linha in c:
             self.rastreio = linha[1]
@@ -488,4 +588,5 @@ janela.title('AP - RASTREIO CORREIOS v1.2')
 janela.update()
 janela.mainloop()
 if janela.destroy or janela.quit:
+    pass
     os.system(f'rm {pidfile}')
