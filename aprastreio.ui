@@ -1,0 +1,717 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkImage" id="imgAtualizar">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">imagens/Atualizar.png</property>
+  </object>
+  <object class="GtkImage" id="imgChecarAtt">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-connect</property>
+  </object>
+  <object class="GtkImage" id="imgDeletar">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">imagens/Lixeira.png</property>
+  </object>
+  <object class="GtkImage" id="imgEmail">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">imagens/Email.png</property>
+  </object>
+  <object class="GtkImage" id="imgNovaAtt">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-dialog-info</property>
+  </object>
+  <object class="GtkImage" id="imgSalvar">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">imagens/Salvar.png</property>
+  </object>
+  <object class="GtkImage" id="imgSincRastreios">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-refresh</property>
+  </object>
+  <object class="GtkImage" id="imgWhatsApp">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="pixbuf">imagens/WhatsApp.png</property>
+  </object>
+  <object class="GtkWindow" id="aprastreio">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">AP - RASTREIO CORREIOS v1.3</property>
+    <property name="resizable">False</property>
+    <property name="default_width">660</property>
+    <property name="default_height">690</property>
+    <property name="icon">imagens/iconejanela.png</property>
+    <signal name="destroy" handler="on_aprastreio_destroy" swapped="no"/>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <object class="GtkLayout">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="width">600</property>
+        <property name="height">595</property>
+        <child>
+          <object class="GtkLabel" id="lbRastreio">
+            <property name="width_request">82</property>
+            <property name="height_request">35</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">RASTREIO: </property>
+          </object>
+          <packing>
+            <property name="y">47</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="lbObjeto">
+            <property name="width_request">100</property>
+            <property name="height_request">28</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">OBJETO: </property>
+          </object>
+          <packing>
+            <property name="x">241</property>
+            <property name="y">50</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkEntry" id="txtRastreio">
+            <property name="width_request">182</property>
+            <property name="height_request">28</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="has_focus">True</property>
+            <property name="max_length">13</property>
+            <property name="max_width_chars">13</property>
+          </object>
+          <packing>
+            <property name="x">74</property>
+            <property name="y">50</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="btnRastrear">
+            <property name="label" translatable="yes">RASTREAR</property>
+            <property name="width_request">100</property>
+            <property name="height_request">34</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <signal name="clicked" handler="on_btnRastrear_clicked" swapped="no"/>
+            <accelerator key="KP_Enter" signal="clicked"/>
+            <accelerator key="Return" signal="clicked"/>
+            <accelerator key="KP_Enter" signal="activate"/>
+            <accelerator key="Return" signal="activate"/>
+          </object>
+          <packing>
+            <property name="x">551</property>
+            <property name="y">45</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="btnSalvar">
+            <property name="width_request">42</property>
+            <property name="height_request">42</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="receives_default">True</property>
+            <property name="image">imgSalvar</property>
+            <signal name="clicked" handler="on_btnSalvar_clicked" swapped="no"/>
+            <accelerator key="s" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
+          </object>
+          <packing>
+            <property name="x">8</property>
+            <property name="y">640</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="btnAtualizar">
+            <property name="width_request">42</property>
+            <property name="height_request">42</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="receives_default">True</property>
+            <property name="image">imgAtualizar</property>
+            <signal name="clicked" handler="on_btnAtualizar_clicked" swapped="no"/>
+            <accelerator key="u" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
+          </object>
+          <packing>
+            <property name="x">54</property>
+            <property name="y">640</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="btnDeletar">
+            <property name="width_request">42</property>
+            <property name="height_request">42</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="receives_default">True</property>
+            <property name="image">imgDeletar</property>
+            <signal name="clicked" handler="on_btnDeletar_clicked" swapped="no"/>
+            <accelerator key="d" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
+          </object>
+          <packing>
+            <property name="x">100</property>
+            <property name="y">640</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="btnEmail">
+            <property name="width_request">42</property>
+            <property name="height_request">42</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="receives_default">True</property>
+            <property name="image">imgEmail</property>
+            <signal name="clicked" handler="on_btnEmail_clicked" swapped="no"/>
+            <accelerator key="e" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
+          </object>
+          <packing>
+            <property name="x">560</property>
+            <property name="y">640</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="btnWhatsApp">
+            <property name="width_request">42</property>
+            <property name="height_request">42</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="receives_default">True</property>
+            <property name="image">imgWhatsApp</property>
+            <signal name="clicked" handler="on_btnWhatsApp_clicked" swapped="no"/>
+            <accelerator key="w" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
+          </object>
+          <packing>
+            <property name="x">605</property>
+            <property name="y">640</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="width_request">164</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">AP Rastreio Correios - 2020</property>
+          </object>
+          <packing>
+            <property name="x">258</property>
+            <property name="y">638</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="width_request">201</property>
+            <property name="height_request">24</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Software criado por Alex Pinheiro</property>
+          </object>
+          <packing>
+            <property name="x">239</property>
+            <property name="y">660</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBoxText" id="liObjeto">
+            <property name="width_request">226</property>
+            <property name="height_request">30</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="button_sensitivity">on</property>
+            <property name="has_entry">True</property>
+            <signal name="changed" handler="on_liObjeto_changed" swapped="no"/>
+            <signal name="changed" handler="on_liObjeto_changed" swapped="no"/>
+            <child internal-child="entry">
+              <object class="GtkEntry" id="txtObjeto">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="max_length">30</property>
+                <property name="max_width_chars">30</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="x">321</property>
+            <property name="y">47</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow">
+            <property name="width_request">643</property>
+            <property name="height_request">548</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="shadow_type">in</property>
+            <child>
+              <object class="GtkTextView" id="txtCampo">
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="can_focus">False</property>
+                <property name="editable">False</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="x">7</property>
+            <property name="y">85</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkMenuBar">
+            <property name="width_request">670</property>
+            <property name="height_request">0</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkMenuItem">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">_Arquivo</property>
+                <property name="use_underline">True</property>
+                <child type="submenu">
+                  <object class="GtkMenu">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkImageMenuItem" id="sincRastreios">
+                        <property name="label" translatable="yes">Sincronizar Rastreios...</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="image">imgSincRastreios</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_sincRastreios_activate" swapped="no"/>
+                        <accelerator key="r" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="moverParaEntregues">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Mover Para Entregues</property>
+                        <signal name="activate" handler="on_moverParaEntregues_activate" swapped="no"/>
+                        <accelerator key="b" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="entregues">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Mostrar Apenas Entregues</property>
+                        <signal name="activate" handler="on_entregues_activate" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="pendentes">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Mostrar Apenas Pendentes</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_pendentes_activate" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="btnSair">
+                        <property name="label">gtk-quit</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
+                        <signal name="activate" handler="on_btnSair_activate" swapped="no"/>
+                        <accelerator key="q" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Aj_uda</property>
+                <property name="use_underline">True</property>
+                <child type="submenu">
+                  <object class="GtkMenu">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkImageMenuItem" id="btnChecarAtt">
+                        <property name="label" translatable="yes">Procurar Atualizações</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="image">imgChecarAtt</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_btnChecarAtt_activate" swapped="no"/>
+                        <accelerator key="r" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSeparatorMenuItem" id="ajudaSeparador">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="btnSobre">
+                        <property name="label">gtk-about</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
+                        <signal name="activate" handler="on_btnSobre_activate" swapped="no"/>
+                        <accelerator key="h" signal="activate" modifiers="GDK_CONTROL_MASK"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkImageMenuItem" id="btnNovaAtt">
+                        <property name="label" translatable="yes">Nova Atualização Disponível. Baixe agora!</property>
+                        <property name="visible">True</property>
+                        <property name="sensitive">False</property>
+                        <property name="can_focus">False</property>
+                        <property name="image">imgNovaAtt</property>
+                        <property name="use_stock">False</property>
+                        <signal name="activate" handler="on_btnNovaAtt_activate" swapped="no"/>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkMessageDialog" id="janErro">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Erro de Rede</property>
+    <property name="type_hint">dialog</property>
+    <property name="deletable">False</property>
+    <property name="transient_for">aprastreio</property>
+    <property name="message_type">error</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can_focus">False</property>
+            <property name="homogeneous">True</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="btnErroOk">
+                <property name="label">gtk-ok</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <signal name="clicked" handler="on_btnErroOk_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkMessageDialog" id="janInfo">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">Informação</property>
+    <property name="type_hint">dialog</property>
+    <property name="deletable">False</property>
+    <property name="transient_for">aprastreio</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="btnJanInfo">
+                <property name="label">gtk-ok</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <signal name="clicked" handler="on_btnJanInfo_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkMessageDialog" id="janPergunta">
+    <property name="can_focus">False</property>
+    <property name="type_hint">dialog</property>
+    <property name="deletable">False</property>
+    <property name="transient_for">aprastreio</property>
+    <property name="message_type">question</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can_focus">False</property>
+            <property name="homogeneous">True</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="btnPerguntaNão">
+                <property name="label">gtk-no</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <signal name="clicked" handler="on_btnPerguntaNão_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="btnPerguntaSim">
+                <property name="label">gtk-yes</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <signal name="clicked" handler="on_btnPerguntaSim_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkMessageDialog" id="janPerguntaAtt">
+    <property name="can_focus">False</property>
+    <property name="type_hint">dialog</property>
+    <property name="deletable">False</property>
+    <property name="transient_for">aprastreio</property>
+    <property name="message_type">question</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="btnPerguntaAttNão">
+                <property name="label">gtk-no</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <signal name="clicked" handler="on_btnPerguntaAttNão_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="btnPerguntaAttSim">
+                <property name="label">gtk-yes</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <signal name="clicked" handler="on_btnPerguntaAttSim_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkMessageDialog" id="pergAttRastreios">
+    <property name="can_focus">False</property>
+    <property name="type_hint">dialog</property>
+    <property name="transient_for">aprastreio</property>
+    <property name="message_type">question</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can_focus">False</property>
+            <property name="homogeneous">True</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="btnAttNão">
+                <property name="label">gtk-no</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <signal name="clicked" handler="on_btnAttNão_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="btnAttSim">
+                <property name="label">gtk-yes</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <signal name="clicked" handler="on_btnAttSim_clicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkAboutDialog" id="sobre">
+    <property name="can_focus">False</property>
+    <property name="title" translatable="yes">AP Ratsreio</property>
+    <property name="type_hint">dialog</property>
+    <property name="deletable">False</property>
+    <property name="transient_for">aprastreio</property>
+    <property name="attached_to">btnSobre</property>
+    <property name="program_name">AP Rastreio</property>
+    <property name="version">1.3</property>
+    <property name="copyright" translatable="yes">Alex Pinheiro</property>
+    <property name="website">https://github.com/Alexsussa/aprastreio</property>
+    <property name="website_label" translatable="yes">GitHub AP Rastreio</property>
+    <property name="authors">Alex Pinheiro</property>
+    <property name="documenters">Alex Pinheiro</property>
+    <property name="translator_credits" translatable="yes">Alex Pinheiro</property>
+    <property name="artists">Alex Pinheiro</property>
+    <property name="logo">imagens/sobre.png</property>
+    <property name="license_type">mit-x11</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkTextBuffer" id="txtbuffer"/>
+</interface>
