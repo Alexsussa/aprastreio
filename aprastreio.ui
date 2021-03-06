@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.22.2 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkImage" id="imgAtualizar">
@@ -50,7 +50,7 @@
     <property name="default_height">690</property>
     <property name="icon">imagens/iconejanela.png</property>
     <signal name="destroy" handler="on_aprastreio_destroy" swapped="no"/>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
     <child>
@@ -108,10 +108,10 @@
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <signal name="clicked" handler="on_btnRastrear_clicked" swapped="no"/>
-            <accelerator key="KP_Enter" signal="clicked"/>
-            <accelerator key="Return" signal="clicked"/>
-            <accelerator key="KP_Enter" signal="activate"/>
             <accelerator key="Return" signal="activate"/>
+            <accelerator key="KP_Enter" signal="activate"/>
+            <accelerator key="Return" signal="clicked"/>
+            <accelerator key="KP_Enter" signal="clicked"/>
           </object>
           <packing>
             <property name="x">551</property>
@@ -261,6 +261,7 @@
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="editable">False</property>
+                <property name="indent">5</property>
               </object>
             </child>
           </object>
@@ -389,7 +390,7 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="btnNovaAtt">
-                        <property name="label" translatable="yes">Nova Atualização Disponível. Baixe agora!</property>
+                        <property name="label" translatable="yes">Nova Atualização Disponível!</property>
                         <property name="visible">True</property>
                         <property name="sensitive">False</property>
                         <property name="can_focus">False</property>
@@ -404,6 +405,21 @@
             </child>
           </object>
         </child>
+        <child>
+          <object class="GtkButton" id="btnLimpar">
+            <property name="width_request">100</property>
+            <property name="height_request">30</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="relief">none</property>
+            <signal name="clicked" handler="on_btnLimpar_clicked" swapped="no"/>
+            <accelerator key="l" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
+          </object>
+          <packing>
+            <property name="x">292</property>
+            <property name="y">698</property>
+          </packing>
+        </child>
       </object>
     </child>
   </object>
@@ -414,7 +430,7 @@
     <property name="deletable">False</property>
     <property name="transient_for">aprastreio</property>
     <property name="message_type">error</property>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
     <child internal-child="vbox">
@@ -458,7 +474,7 @@
     <property name="type_hint">dialog</property>
     <property name="deletable">False</property>
     <property name="transient_for">aprastreio</property>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
     <child internal-child="vbox">
@@ -501,7 +517,7 @@
     <property name="deletable">False</property>
     <property name="transient_for">aprastreio</property>
     <property name="message_type">question</property>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
     <child internal-child="vbox">
@@ -560,7 +576,7 @@
     <property name="deletable">False</property>
     <property name="transient_for">aprastreio</property>
     <property name="message_type">question</property>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
     <child internal-child="vbox">
@@ -617,7 +633,7 @@
     <property name="type_hint">dialog</property>
     <property name="transient_for">aprastreio</property>
     <property name="message_type">question</property>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
     <child internal-child="vbox">
@@ -688,7 +704,7 @@
     <property name="artists">Alex Pinheiro</property>
     <property name="logo">imagens/sobre.png</property>
     <property name="license_type">mit-x11</property>
-    <child>
+    <child type="titlebar">
       <placeholder/>
     </child>
     <child internal-child="vbox">

@@ -85,7 +85,8 @@ class Rastreio:
         versao = urlopen('https://www.dropbox.com/s/61rpf1xg8qr1vh1/version_linux.txt?dl=true').read()
         if float(versao) > float(__version__):
             subprocess.call(
-                ['notify-send', 'AP - Rastreio Correios', 'Há uma nova versão disponível. Clique em ajuda no menu superior e baixe agora!'])
+                ['notify-send', 'AP - Rastreio Correios',
+                 'Há uma nova versão disponível. Clique em ajuda no menu superior e baixe agora!'])
             self.btnNovaAtt.set_sensitive(True)
 
     def on_btnNovaAtt_activate(self, button):
@@ -99,7 +100,8 @@ class Rastreio:
 
     def NotifAltStatus(self, event=None):
         self.pergAttRastreios.show()
-        self.pergAttRastreios.set_markup('\n\nAtualizando status dos rastreios...\nClique em SIM e aguarde até os objetos não entregues aparecerem na tela principal\nou clique em NÃO para atualizar manualmente mais tarde.')
+        self.pergAttRastreios.set_markup(
+            '\n\nAtualizando status dos rastreios...\nClique em SIM e aguarde até os objetos não entregues aparecerem na tela principal\nou clique em NÃO para atualizar manualmente mais tarde.')
 
     def on_btnAttSim_clicked(self, button):
         self.pergAttRastreios.hide()
@@ -124,10 +126,10 @@ class Rastreio:
                              'Todos os objetos não entregues estão na tela principal.'])
 
         except socket.error:
-                subprocess.call(['notify-send', 'AP - Rastreio Correios',
+            subprocess.call(['notify-send', 'AP - Rastreio Correios',
                              'Tempo de resposta do servidor execedido.\n\nSem conexão com a internet.'])
-                self.janErro.show()
-                self.janErro.set_markup('\n\nTempo de resposta do servidor execedido.\n\nSem conexão com a internet.')
+            self.janErro.show()
+            self.janErro.set_markup('\n\nTempo de resposta do servidor execedido.\n\nSem conexão com a internet.')
 
     def on_btnAttNão_clicked(self, button):
         self.pergAttRastreios.hide()
@@ -147,37 +149,45 @@ class Rastreio:
             self.txtObjeto.set_text(item[2])
 
     def on_btnRastrear_clicked(self, button):
+        Thread(target=self.rastrear).start()
+
+    def rastrear(self):
         rastreio = self.txtRastreio.get_text()
         # objeto = self.txtObjeto.get_text()
-        try:
-            subprocess.call(['notify-send', 'AP - Rastreio Correios', 'Rastreando encomenda...'])
-            linkcorreios = urlopen(f'https://www.linkcorreios.com.br/?id={rastreio}', timeout=20)
-            soup = BeautifulSoup(linkcorreios, 'html.parser')
-            status = soup.find('div', attrs={'class': 'singlepost'})
-            retorno = ''
-            if status:
-                retorno = status.text.strip().upper()
-            else: retorno = 'O rastreamento não está disponível no momento:\n\n' \
+        if self.txtRastreio.get_text() == '':
+            self.janInfo.show()
+            self.janInfo.set_markup('\n\nDigite um código de rastreio para buscar as informações.')
+        else:
+            try:
+                subprocess.call(['notify-send', 'AP - Rastreio Correios', 'Rastreando encomenda...'])
+                linkcorreios = urlopen(f'https://www.linkcorreios.com.br/?id={rastreio}', timeout=20)
+                soup = BeautifulSoup(linkcorreios, 'html.parser')
+                status = soup.find('div', attrs={'class': 'singlepost'})
+                retorno = ''
+                if status:
+                    retorno = status.text.strip().upper()
+                else:
+                    retorno = 'O rastreamento não está disponível no momento:\n\n' \
                               '- Verifique se o código do objeto está correto;\n' \
                               '- O objeto pode demorar até 24 horas (após postagem) para ser rastreado no\nsistema dos Correios.'.strip().upper()
-            #retorno = status.text.strip().upper()
-            # print(retorno)
-            self.txtCampo.set_buffer(self.txtcampobuffer)
-            self.txtcampobuffer.set_text(retorno)
-            lastStatus = soup.find('ul', attrs={'class': 'linha_status'})
-            last = lastStatus.text.strip().upper()
-            subprocess.call(['notify-send', 'AP - Rastreio Correios', f'{last}'])
+                # retorno = status.text.strip().upper()
+                # print(retorno)
+                self.txtCampo.set_buffer(self.txtcampobuffer)
+                self.txtcampobuffer.set_text(retorno)
+                lastStatus = soup.find('ul', attrs={'class': 'linha_status'})
+                last = lastStatus.text.strip().upper()
+                subprocess.call(['notify-send', 'AP - Rastreio Correios', f'{last}'])
 
-        except socket.timeout:
-            subprocess.call(
-                ['notify-send', 'AP - Rastreio Correios', 'Tempo de resposta do servidor execedido.'])
-            self.janErro.show()
-            self.janErro.set_markup('\n\nTempo de resposta do servidor execedido.')
+            except socket.timeout:
+                subprocess.call(
+                    ['notify-send', 'AP - Rastreio Correios', 'Tempo de resposta do servidor execedido.'])
+                self.janErro.show()
+                self.janErro.set_markup('\n\nTempo de resposta do servidor execedido.')
 
-        except socket.error:
-            subprocess.call(['notify-send', 'AP - Rastreio Correios', 'Sem conexão com a internet.'])
-            self.janErro.show()
-            self.janErro.set_markup('\n\nSem conexão com a internet.')
+            except socket.error:
+                subprocess.call(['notify-send', 'AP - Rastreio Correios', 'Sem conexão com a internet.'])
+                self.janErro.show()
+                self.janErro.set_markup('\n\nSem conexão com a internet.')
 
     def on_btnErroOk_clicked(self, button):
         self.janErro.hide()
@@ -191,7 +201,7 @@ class Rastreio:
         elif len(rastreio) != 13:
             self.janInfo.show()
             self.janInfo.set_markup('\n\nRastreio deve conter 13 dígitos\nsendo duas letras iniciais e '
-                                                       'duas letras finais, como no\nexemplo abaixo:\n\n "OJ123456789BR"')
+                                    'duas letras finais, como no\nexemplo abaixo:\n\n "OJ123456789BR"')
 
         else:
             rastreio = self.txtRastreio.get_text().strip().upper()
@@ -226,7 +236,8 @@ class Rastreio:
         rastreio = self.txtRastreio.get_text().strip().upper()
         objeto = self.txtObjeto.get_text().strip().upper()
         self.janPerguntaAtt.hide()
-        c.execute(f'UPDATE rastreio SET codrastreio = "{rastreio}", objeto = "{objeto}" WHERE codrastreio = "{rastreio}"')
+        c.execute(
+            f'UPDATE rastreio SET codrastreio = "{rastreio}", objeto = "{objeto}" WHERE codrastreio = "{rastreio}"')
         conexao.commit()
 
         self.txtRastreio.set_text('')
@@ -248,7 +259,7 @@ class Rastreio:
         else:
             self.janPergunta.show()
             self.janPergunta.set_markup('\n\nVocê realmente deseja DELETAR os dados desse rastreio?\n'
-                                                    'Esta ação não poderá ser desfeita.')
+                                        'Esta ação não poderá ser desfeita.')
 
     def on_btnPerguntaNão_clicked(self, button):
         self.janPergunta.hide()
@@ -280,11 +291,12 @@ class Rastreio:
         elif len(rastreio) != 13:
             self.janInfo.show()
             self.janInfo.set_markup('\n\nRastreio deve conter 13 dígitos\nsendo duas letras iniciais e '
-                                                       'duas letras finais, como no\nexemplo abaixo:\n\n "OJ123456789BR"')
+                                    'duas letras finais, como no\nexemplo abaixo:\n\n "OJ123456789BR"')
 
         else:
             rastreio = self.txtRastreio.get_text()
-            webbrowser.open(f'https://web.whatsapp.com/send?phone=&text=Ol%c3%a1.%20Clique%20no%20link%20para%20rastrear%20o%20objeto%20c%c3%b3digo%20{rastreio}%0ahttps%3a%2f%2fwww.linkcorreios.com.br%2f{rastreio}%3fw%3d1&source=&data=')
+            webbrowser.open(
+                f'https://web.whatsapp.com/send?phone=&text=Ol%c3%a1.%20Clique%20no%20link%20para%20rastrear%20o%20objeto%20c%c3%b3digo%20{rastreio}%0ahttps%3a%2f%2fwww.linkcorreios.com.br%2f{rastreio}%3fw%3d1&source=&data=')
 
     def on_btnEmail_clicked(self, button):
         if not os.path.exists('/usr/bin/thunderbird') and not os.path.exists('/usr/bin/evolution'):
@@ -300,7 +312,7 @@ class Rastreio:
         elif len(rastreio) != 13:
             self.janInfo.show()
             self.janInfo.set_markup('\n\nRastreio deve conter 13 dígitos\nsendo duas letras iniciais e '
-                                                       'duas letras finais, como no\nexemplo abaixo:\n\n "OJ123456789BR"')
+                                    'duas letras finais, como no\nexemplo abaixo:\n\n "OJ123456789BR"')
         else:
             mc = MailComposer()
             rastreio = self.txtRastreio.get_text()
@@ -349,6 +361,11 @@ class Rastreio:
     def on_aprastreio_destroy(self, window):
         Gtk.main_quit()
         os.unlink(pidfile)
+
+    def on_btnLimpar_clicked(self, button):
+        self.txtRastreio.set_text('')
+        self.txtObjeto.set_text('')
+        self.txtcampobuffer.set_text('')
 
 
 builder = Gtk.Builder()
